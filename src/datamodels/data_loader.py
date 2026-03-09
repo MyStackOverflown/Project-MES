@@ -1,6 +1,6 @@
 from typing import Tuple, Optional
 
-from models import GlobalData, Grid, Element, Node
+from src.datamodels.models import GlobalData, Grid, Element, Node
 
 def parse_mesh_file(filepath: str) -> Tuple[Optional[GlobalData], Optional[Grid]]:
     data = GlobalData()
@@ -51,9 +51,9 @@ def parse_mesh_file(filepath: str) -> Tuple[Optional[GlobalData], Optional[Grid]
                     elif key == "SpecificHeat":
                         data.specific_heat = float(val)
                     elif key == "Nodes" and parts[1] == "number":
-                        data.number = int(parts[2])
+                        data.n_nodes = int(parts[2])
                     elif key == "Elements" and parts[1] == "number":
-                        data.number = int(parts[2])
+                        data.n_elements = int(parts[2])
 
             elif current_section == "NODE":
                 parts = line.split(",")
@@ -73,6 +73,14 @@ def parse_mesh_file(filepath: str) -> Tuple[Optional[GlobalData], Optional[Grid]
 
                 node_ids = [int(n.strip()) for n in parts[1:]]
                 grid.elements.append(Element(node_ids = node_ids))
+
+            elif current_section == "BC":
+                parts = line.split(",")
+
+                for part in parts:
+                    node_id = int(part.strip())
+                    if 0 < node_id <= len(grid.nodes):
+                        grid.nodes[node_id - 1].bc = True
 
         grid.n_nodes = len(grid.nodes)
         grid.n_elements = len(grid.elements)

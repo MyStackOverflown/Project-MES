@@ -19,16 +19,16 @@ class GlobalData:
     def summary(self) -> str:
         return (
             f"Global Data:\n"
-            f"  SimulationTime     : {self.simulation_time}\n"
-            f"  SimulationStepTime : {self.simulation_step_time}\n"
-            f"  Conductivity       : {self.conductivity}\n"
-            f"  Alfa               : {self.alfa}\n"
-            f"  Tot                : {self.tot}\n"
-            f"  InitialTemp        : {self.initial_temp}\n"
-            f"  Density            : {self.density}\n"
-            f"  SpecificHeat       : {self.specific_heat}\n"
-            f"  Nodes number       : {self.n_nodes}\n"
-            f"  Elements number    : {self.n_elements}\n"
+            f"SimulationTime: {self.simulation_time}\n"
+            f"SimulationStepTime: {self.simulation_step_time}\n"
+            f"Conductivity: {self.conductivity}\n"
+            f"Alfa: {self.alfa}\n"
+            f"Tot: {self.tot}\n"
+            f"InitialTemp: {self.initial_temp}\n"
+            f"Density: {self.density}\n"
+            f"SpecificHeat: {self.specific_heat}\n"
+            f"Nodes number: {self.n_nodes}\n"
+            f"Elements number: {self.n_elements}\n"
         )
 
 @dataclass
@@ -53,14 +53,18 @@ class Element:
     node_ids: List[int]
     jacobians: List["Jacobian"] = field(default_factory=list)
     H: Optional[ndarray] = None
+    Hbc: Optional[ndarray] = None
+    P: Optional[ndarray] = None
+    C: Optional[ndarray] = None
 
     def summary(self) -> str:
         return f"Nodes = {self.node_ids}"
 
 @dataclass
 class Node:
-    x: float
-    y: float
+    x: float = 0.0
+    y: float = 0.0
+    bc: bool = False # czy war brzeg?
 
     def summary(self) -> str:
-        return f"(x = {self.x}\ny = {self.y})\n"
+        return f"bc = {self.bc}\n(x = {self.x}\ny = {self.y})\n"

@@ -1,15 +1,12 @@
-from models import GlobalData, Grid, Element
-
 from numpy import ndarray, zeros, array, outer
 
-from elem_univ import ElemUniv
+from src.datamodels.models import GlobalData, Grid, Element
+from src.jacobian.elem_univ import ElemUniv
 
-
-def H_matrix_for_element(element: Element, elem_univ : ElemUniv, conductivity: float) -> ndarray:
+def H_matrix_for_element(element: Element, elem_univ : ElemUniv, conductivity: float, n: int = 2) -> ndarray:
     H_for_element = zeros((4, 4))
-    n = len(elem_univ.W)
 
-    for i in range(n):
+    for i in range(n * n):
         j = element.jacobians[i].J
         j_inv = element.jacobians[i].J_inv
         j_det = element.jacobians[i].J_det
@@ -25,17 +22,13 @@ def H_matrix_for_element(element: Element, elem_univ : ElemUniv, conductivity: f
         Y = outer(dN_dy, dN_dy)
 
         H_for_point = conductivity * (X + Y) * j_det * w
-
         H_for_element += H_for_point
 
     return H_for_element
 
-def H_matrix_for_all(grid: Grid, elem_univ: ElemUniv, global_data: GlobalData) -> None:
+def H_matrix_for_all(grid: Grid, elem_univ: ElemUniv, global_data: GlobalData, n: int = 2) -> None:
     for element in grid.elements:
-        element.H = H_matrix_for_element(element, elem_univ, global_data.conductivity)
-
-def H_global_matrix():
-    pass
+        element.H = H_matrix_for_element(element, elem_univ, global_data.conductivity, n)
 
 def print_H_matrix(H: ndarray) -> None:
     print(f"H:\n{H}\n")
